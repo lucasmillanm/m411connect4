@@ -36,7 +36,7 @@ public class GoodPlayer extends Connect4ArenaMain.DefaultPlayer {
       return -100;
     }
     if (depth == 0) {
-      return 0; // evaluate(board, currentPlayer);
+      return evaluate(board, currentPlayer);
     }
 
     int max = alpha;
