@@ -18,7 +18,7 @@ public class Connect4ArenaMain {
     static final int NOMOVE = -1;
 
     public static void main(String[] args) {
-        new Connect4ArenaMain().play(new GoodPlayer(10), new HumanPlayer());
+        new Connect4ArenaMain().play(new GoodPlayer(2), new GreedyPlayer());
     }
 
     static String toDebugString(Stone[] board) {
