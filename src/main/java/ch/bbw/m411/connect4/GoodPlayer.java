@@ -12,7 +12,7 @@ public class GoodPlayer extends Connect4ArenaMain.DefaultPlayer {
   @Override
   int play() {
     minDepth = Math.min(countMovesAvailable(), maxDepth);
-    getScore(myColor, minDepth, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    getScore(myColor, minDepth, -10000, 10000);
     return bestMove;
   }
 
@@ -35,42 +35,41 @@ public class GoodPlayer extends Connect4ArenaMain.DefaultPlayer {
     if (isWinning(board, currentPlayer.opponent())) {
       return -100;
     }
-    if (alpha == 0) {
-      return 0;
-    }
     if (depth == 0) {
-      return evaluate(board, currentPlayer);
+      return 0; // evaluate(board, currentPlayer);
     }
 
     int max = alpha;
-
-    for (int move : getMoves()) {
+    var moves = getMoves();
+    for (int i = moves.length - 1; i >= 0; i--) {
+      var move = moves[i];
       board[move] = myColor; // play to the position
 
       int currentValue = -getScore(myColor.opponent(), depth - 1, -beta, -max);
 
       board[move] = null; // revert the last move
       if (depth == minDepth) {
-        System.out.println("Index: " + move + " Value: " + currentValue + "\n");
+        System.out.println(depth + "Index: " + move + " Value: " + currentValue + " p" + myColor);
       }
 
       if (currentValue > max) {
         max = currentValue;
         if (depth == minDepth) {
-          bestMove = move; // a bit of a hack: we have to return a position (not a score)
+          bestMove = move; // return a position not a score
         }
         if (max >= beta) {
-          break; // alpha-beta pruning
+          break; // alpha beta
         }
       }
     }
     return max;
   }
 
+  // gets possible moves
   int[] getMoves() {
     int[] moves = new int[7];
     int pointer = 0;
-    for (int col = 0; col < 7; col++) {
+    for (int col = 0; col < 7; col++) { // iterates through
       for (int row = 0; row < 4; row++) {
         int i = col + row * 7;
         if (board[i] == null) {
