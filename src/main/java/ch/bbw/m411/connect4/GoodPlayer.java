@@ -43,9 +43,9 @@ public class GoodPlayer extends Connect4ArenaMain.DefaultPlayer {
     var moves = getMoves();
     for (int i = moves.length - 1; i >= 0; i--) {
       var move = moves[i];
-      board[move] = myColor; // play to the position
+      board[move] = currentPlayer; // play to the position
 
-      int currentValue = -getScore(myColor.opponent(), depth - 1, -beta, -max);
+      int currentValue = -getScore(currentPlayer.opponent(), depth - 1, -beta, -max);
 
       board[move] = null; // revert the last move
       if (depth == minDepth) {
