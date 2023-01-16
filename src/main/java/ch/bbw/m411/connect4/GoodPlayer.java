@@ -1,28 +1,70 @@
 package ch.bbw.m411.connect4;
 
+import static ch.bbw.m411.connect4.Connect4ArenaMain.NOMOVE;
 import static ch.bbw.m411.connect4.Connect4ArenaMain.isWinning;
 
 public class GoodPlayer extends Connect4ArenaMain.DefaultPlayer {
 
+  int bestMove = NOMOVE;
+  int maxDepth;
+  int minDepth;
+
   @Override
   int play() {
-    return 0;
+    minDepth = Math.min(countMovesAvailable(), maxDepth);
+    getScore(myColor, minDepth, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    return bestMove;
   }
 
-  int getScore(Connect4ArenaMain.Stone currentPlayer, int freeCount, int depth) {
+  public GoodPlayer(int depth) {
+    super();
+    maxDepth = depth;
+  }
+
+  int countMovesAvailable() {
+    int moves = 0;
+    for (Connect4ArenaMain.Stone stone : board) {
+      if (stone == null) {
+        moves++;
+      }
+    }
+    return moves;
+  }
+
+  int getScore(Connect4ArenaMain.Stone currentPlayer, int depth, int alpha, int beta) {
     if (isWinning(board, currentPlayer.opponent())) {
       return -100;
     }
-    if (freeCount == 0) {
+    if (alpha == 0) {
       return 0;
     }
     if (depth == 0) {
       return evaluate(board, currentPlayer);
     }
 
-    while (getMoves().length >= 1) {
+    int max = alpha;
+
+    for (int move : getMoves()) {
+      board[move] = myColor; // play to the position
+
+      int currentValue = -getScore(myColor.opponent(), depth - 1, -beta, -max);
+
+      board[move] = null; // revert the last move
+      if (depth == minDepth) {
+        System.out.println("Index: " + move + " Value: " + currentValue + "\n");
+      }
+
+      if (currentValue > max) {
+        max = currentValue;
+        if (depth == minDepth) {
+          bestMove = move; // a bit of a hack: we have to return a position (not a score)
+        }
+        if (max >= beta) {
+          break; // alpha-beta pruning
+        }
+      }
     }
-    return 0;
+    return max;
   }
 
   int[] getMoves() {
